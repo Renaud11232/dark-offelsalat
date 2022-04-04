@@ -1,0 +1,18 @@
+version: "3"
+services:
+  darkoffelsalat:
+    container_name: darkoffelsalat
+    image: "ghcr.io/renaud11232/darkoffelsalat"
+    environment:
+      LOG_LEVEL: INFO
+      TWITCH_TOKEN: yourtwitchtoken
+      CHANNEL: twitchchannel
+      MESSAGE: The message to send including a {{url}}
+      TIMEOUT: 300
+      YOUTUBE_TOKEN: youtubetoken
+      YOUTUBE_PLAYLIST: yourplaylistid
+    command:
+      - some
+      - example
+      - words
+    restart: unless-stopped
