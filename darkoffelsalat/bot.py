@@ -19,10 +19,7 @@ class DarkOffelsalat(twitchio.Client):
         self.__last_message = 0
         self.__timeout = timeout
         self.__youtube_playlist = youtube_playlist
-        if youtube_token:
-            self.__youtube = Api(api_key=youtube_token)
-        else:
-            self.__youtube = None
+        self.__youtube = Api(api_key=youtube_token) if youtube_token else None
         self.__message = message
         twitchio.Client.__init__(self, token=twitch_token, initial_channels=[channel])
 
@@ -60,7 +57,6 @@ class DarkOffelsalat(twitchio.Client):
 
     async def __send_text(self, channel: twitchio.Channel):
         self.__logger.debug("Sending normal message")
-        print(self.__message)
         await channel.send(self.__message)
 
     def run(self):

@@ -2,7 +2,7 @@
 
 Dark Offelsalat is a silly project of mine... It all started as a joke during a twitch stream.
 After clipping a rather funny moment of the stream, the idea of creating a bot that will present the clip to anyone joining the stream came to me.
-The streamer wasn't against it, in fact in challenged me to do it before the end of the stream... Which obviously I did.
+The streamer wasn't against it, in fact he challenged me to do it before the end of the stream... Which obviously I did.
 I mean... I had to !
 
 I wasn't happy with the 1st version, so I made this one.
