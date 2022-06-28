@@ -31,7 +31,8 @@ class DarkOffelsalat(twitchio.Client):
         if message.author is None:
             self.__logger.debug("Received message from the bot, ignoring it")
             return
-        if message.author == "StreamElements":
+        self.__logger.debug("Message: %s from %s" % (message.content, message.author.name))
+        if message.author.name.lower() == "streamelements":
             groups = re.match(r"^(.*?) lance le dé et tombe sur un\.\.\. (\d+)!$", message.content)
             if groups:
                 dice_value = int(groups.group(2))
