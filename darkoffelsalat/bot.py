@@ -36,7 +36,9 @@ class DarkOffelsalat(twitchio.Client):
             dice_value = int(groups.group(2))
             user = groups.group(1)
             self.__logger.debug("%s rolled the dice and got a %d" % (user, dice_value))
-            if dice_value < 10:
+            if dice_value == 1:
+                await message.channel.send("@%s é-cheh-c critique" % user)
+            elif dice_value < 10:
                 await message.channel.send("@%s cheh" % user)
             return
         if not self.__message_matches(message):
