@@ -31,16 +31,19 @@ class DarkOffelsalat(twitchio.Client):
         if message.author is None:
             self.__logger.debug("Received message from the bot, ignoring it")
             return
-        groups = re.match(r"^(.*?) lance le dé et tombe sur un\.\.\. (\d+)!$", message.content)
-        if groups:
-            dice_value = int(groups.group(2))
-            user = groups.group(1)
-            self.__logger.debug("%s rolled the dice and got a %d" % (user, dice_value))
-            if dice_value == 1:
-                await message.channel.send("@%s é-cheh-c critique" % user)
-            elif dice_value < 10:
-                await message.channel.send("@%s cheh" % user)
-            return
+        if message.author == "StreamElements":
+            groups = re.match(r"^(.*?) lance le dé et tombe sur un\.\.\. (\d+)!$", message.content)
+            if groups:
+                dice_value = int(groups.group(2))
+                user = groups.group(1)
+                self.__logger.debug("%s rolled the dice and got a %d" % (user, dice_value))
+                if dice_value == 1:
+                    await message.channel.send("@%s é-cheh-c critique" % user)
+                elif dice_value == 20:
+                    await message.channel.send("@%s" % user)
+                elif dice_value < 10:
+                    await message.channel.send("@%s cheh" % user)
+                return
         if not self.__message_matches(message):
             self.__logger.debug("Received message did not contain any matching word")
             return
