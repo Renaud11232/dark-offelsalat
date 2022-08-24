@@ -41,7 +41,7 @@ class DarkOffelsalat(twitchio.Client):
                 if dice_value == 1:
                     await message.channel.send("@%s é-cheh-c critique" % user)
                 elif dice_value == 20:
-                    await message.channel.send("@%s" % user)
+                    await message.channel.send("@%s noice" % user)
                 elif dice_value < 10:
                     await message.channel.send("@%s cheh" % user)
                 return
