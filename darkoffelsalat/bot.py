@@ -2,6 +2,7 @@ import logging
 import sys
 import time
 import twitchio
+import twitchio.parse
 import re
 from pyyoutube import Api
 
@@ -32,19 +33,6 @@ class DarkOffelsalat(twitchio.Client):
             self.__logger.debug("Received message from the bot, ignoring it")
             return
         self.__logger.debug("Message: %s from %s" % (message.content, message.author.name))
-        if message.author.name.lower() == "streamelements":
-            groups = re.match(r"^(.*?) lance le dé et tombe sur un\.\.\. (\d+)!$", message.content)
-            if groups:
-                dice_value = int(groups.group(2))
-                user = groups.group(1)
-                self.__logger.debug("%s rolled the dice and got a %d" % (user, dice_value))
-                if dice_value == 1:
-                    await message.channel.send("@%s é-cheh-c critique" % user)
-                elif dice_value == 20:
-                    await message.channel.send("@%s noice" % user)
-                elif dice_value < 10:
-                    await message.channel.send("@%s cheh" % user)
-                return
         if not self.__message_matches(message):
             self.__logger.debug("Received message did not contain any matching word")
             return
@@ -57,6 +45,23 @@ class DarkOffelsalat(twitchio.Client):
             await self.__send_text(message.channel)
         else:
             await self.__send_youtube(message.channel)
+
+    async def event_raw_data(self, data):
+        parsed = twitchio.parse.parser(data, self.nick)
+        if parsed["action"] == "USERNOTICE" and parsed["badges"]["login"] == "streamelements" and parsed["badges"]["msg-id"] == "announcement":
+            groups = re.match(r"^(.*?) lance le dé et tombe sur un\.\.\. (\d+)!$", parsed["message"])
+            if groups:
+                dice_value = int(groups.group(2))
+                user = groups.group(1)
+                self.__logger.debug("%s rolled the dice and got a %d" % (user, dice_value))
+                channel = self.get_channel(parsed["channel"])
+                if dice_value == 1:
+                    await channel.send("@%s é-cheh-c critique" % user)
+                elif dice_value == 20:
+                    await channel.send("@%s noice" % user)
+                elif dice_value < 10:
+                    await channel.send("@%s cheh" % user)
+                return
 
     def __message_matches(self, message: twitchio.Message):
         content = message.content.lower()
