@@ -4,6 +4,7 @@ import time
 import twitchio
 import twitchio.parse
 import re
+import random
 from pyyoutube import Api
 
 
@@ -23,6 +24,9 @@ class DarkOffelsalat(twitchio.Client):
         self.__youtube_playlist = youtube_playlist
         self.__youtube = Api(api_key=youtube_token) if youtube_token else None
         self.__message = message
+        self.__commands = {
+            "!poutre": self.__handle_poutre
+        }
         twitchio.Client.__init__(self, token=twitch_token, initial_channels=[channel])
 
     async def event_ready(self):
@@ -33,6 +37,9 @@ class DarkOffelsalat(twitchio.Client):
             self.__logger.debug("Received message from the bot, ignoring it")
             return
         self.__logger.debug("Message: %s from %s" % (message.content, message.author.name))
+        if self.__message_is_command(message):
+            await self.__handle_command(message)
+            return
         if not self.__message_matches(message):
             self.__logger.debug("Received message did not contain any matching word")
             return
@@ -45,6 +52,16 @@ class DarkOffelsalat(twitchio.Client):
             await self.__send_text(message.channel)
         else:
             await self.__send_youtube(message.channel)
+
+    async def __handle_command(self, message: twitchio.Message):
+        message_split = message.content.split()
+        if len(message_split) == 0:
+            return
+        await self.__commands[message_split[0]](message)
+
+    async def __handle_poutre(self, message: twitchio.Message):
+        size = random.randrange(0, 500)
+        await message.channel.send("La poutre mesure %dcm" % size)
 
     async def event_raw_data(self, data):
         parsed = twitchio.parse.parser(data, self.nick)
@@ -66,6 +83,12 @@ class DarkOffelsalat(twitchio.Client):
     def __message_matches(self, message: twitchio.Message):
         content = message.content.lower()
         return any(word.lower() in content for word in self.__words)
+
+    def __message_is_command(self, message: twitchio.Message):
+        message_split = message.content.split()
+        if len(message_split) > 0 and message_split[0] in self.__commands:
+            return True
+        return False
 
     async def __send_youtube(self, channel: twitchio.Channel):
         self.__logger.debug("Sending youtube message")
