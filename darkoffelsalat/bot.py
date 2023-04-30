@@ -67,24 +67,31 @@ class DarkOffelsalat(twitchio.Client):
 
     async def __handle_sus(self, message: twitchio.Message):
         message_split = message.content.split()
-        if len(message_split) != 2:
-            await message.channel.send("Paramètre manquant" % message.author.name)
+        if len(message_split) < 2:
+            await message.channel.send("Paramètre manquant")
             return
-        response = requests.get("https://rule34.xxx/public/autocomplete.php", params={
+        if len(message_split) > 2:
+            await message.channel.send("Trop de paramètres")
+            return
+        self.__logger.debug("%s looked up %s" % (message.author.name, message_split[1]))
+        params = {
             "q": message_split[1]
-        }, headers={
+        }
+        response = requests.get("https://rule34.xxx/public/autocomplete.php", params=params, headers={
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.93 Safari/537.36'
         })
         if response.status_code >= 400:
-            await message.channel.send("La requête a échoué avec un status HTTP %d" % response.status_code)
+            self.__logger.warning("Request failed with status code %d" % response.status_code)
+            await message.channel.send("La requête a échoué avec un code HTTP %d" % response.status_code)
             return
         results = response.json()
+        self.__logger.debug("Request response : %r" % results)
         matched_item = None
         for result in results:
-            if result["value"] == message_split[0]:
+            if result["value"] == message_split[1]:
                 matched_item = result
                 break
-            if result["value"].startswith(message_split[0]):
+            if result["value"].startswith(message_split[1]):
                 matched_item = result
         if matched_item is None:
             await message.channel.send("Aucun résulat trouvé.")
@@ -94,7 +101,8 @@ class DarkOffelsalat(twitchio.Client):
 
     async def event_raw_data(self, data):
         parsed = twitchio.parse.parser(data, self.nick)
-        if parsed["action"] == "USERNOTICE" and parsed["badges"]["login"] == "streamelements" and parsed["badges"]["msg-id"] == "announcement":
+        if parsed["action"] == "USERNOTICE" and parsed["badges"]["login"] == "streamelements" and parsed["badges"][
+            "msg-id"] == "announcement":
             groups = re.match(r"^(.*?) lance le dé et tombe sur un\.\.\. (\d+)!$", parsed["message"])
             if groups:
                 dice_value = int(groups.group(2))
