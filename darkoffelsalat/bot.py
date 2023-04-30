@@ -91,7 +91,7 @@ class DarkOffelsalat(twitchio.Client):
             if result["value"] == message_split[1]:
                 matched_item = result
                 break
-            if result["value"].startswith(message_split[1]):
+            if matched_item is None and result["value"].startswith(message_split[1]):
                 matched_item = result
         if matched_item is None:
             await message.channel.send("Aucun résulat trouvé.")
@@ -101,9 +101,9 @@ class DarkOffelsalat(twitchio.Client):
 
     async def event_raw_data(self, data):
         parsed = twitchio.parse.parser(data, self.nick)
-        if parsed["action"] == "USERNOTICE" and parsed["badges"]["login"] == "streamelements" and parsed["badges"][
-            "msg-id"] == "announcement":
-            groups = re.match(r"^(.*?) lance le dé et tombe sur un\.\.\. (\d+)!$", parsed["message"])
+        if parsed is not None and parsed["action"] == "USERNOTICE" and parsed["badges"]["login"] == "streamelements" \
+                and parsed["badges"]["msg-id"] == "announcement":
+            groups = re.match(r"^(.*?) lance le dé et tombe sur un\.\.\. (\d+)!$", parsed["message"].strip())
             if groups:
                 dice_value = int(groups.group(2))
                 user = groups.group(1)
