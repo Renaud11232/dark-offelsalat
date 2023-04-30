@@ -5,6 +5,7 @@ import twitchio
 import twitchio.parse
 import re
 import random
+import requests
 from pyyoutube import Api
 
 
@@ -25,7 +26,8 @@ class DarkOffelsalat(twitchio.Client):
         self.__youtube = Api(api_key=youtube_token) if youtube_token else None
         self.__message = message
         self.__commands = {
-            "!poutre": self.__handle_poutre
+            "!poutre": self.__handle_poutre,
+            "!sus": self.__handle_sus
         }
         twitchio.Client.__init__(self, token=twitch_token, initial_channels=[channel])
 
@@ -62,6 +64,31 @@ class DarkOffelsalat(twitchio.Client):
     async def __handle_poutre(self, message: twitchio.Message):
         size = random.randrange(0, 500)
         await message.channel.send("La poutre mesure %dcm" % size)
+
+    async def __handle_sus(self, message: twitchio.Message):
+        message_split = message.content.split()
+        if len(message_split) != 2:
+            await message.channel.send("Paramètre manquant" % message.author.name)
+            return
+        response = requests.get("https://rule34.xxx/public/autocomplete.php", params={
+            "q": message_split[1]
+        })
+        if response.status_code >= 400:
+            await message.channel.send("La requête a échoué avec un status HTTP %d" % response.status_code)
+            return
+        results = response.json()
+        matched_item = None
+        for result in results:
+            if result["value"] == message_split[0]:
+                matched_item = result
+                break
+            if result["value"].startswith(message_split[0]):
+                matched_item = result
+        if matched_item is None:
+            await message.channel.send("Aucun résulat trouvé.")
+            return
+        groups = re.match(r"^.*\((\d+)\)$", matched_item["label"])
+        await message.channel.send("Il y a %s résultats pour %s" % (groups.group(1), matched_item["value"]))
 
     async def event_raw_data(self, data):
         parsed = twitchio.parse.parser(data, self.nick)
