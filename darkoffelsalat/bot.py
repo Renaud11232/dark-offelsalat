@@ -62,7 +62,7 @@ class DarkOffelsalat(twitchio.Client):
         await self.__commands[message_split[0]](message)
 
     async def __handle_poutre(self, message: twitchio.Message):
-        size = random.randrange(-500, 500)
+        size = random.randrange(-20, 500)
         await message.channel.send("La poutre mesure %dcm" % size)
 
     async def __handle_sus(self, message: twitchio.Message):
