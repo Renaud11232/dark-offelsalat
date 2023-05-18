@@ -8,7 +8,7 @@ def get_long_description():
 
 setuptools.setup(
     name="DarkOffelsalat",
-    version="0.1.1sweet5",
+    version="0.1.1sweet6",
     author="Renaud Gaspard",
     author_email="gaspardrenaud@hotmail.com",
     description="A simple bot that sends the link of the latest video of a youtube channel in a twitch chat",
