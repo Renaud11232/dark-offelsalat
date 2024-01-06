@@ -78,7 +78,8 @@ class DarkOffelsalat(twitchio.Client):
             "q": message_split[1]
         }
         response = requests.get("https://rule34.xxx/public/autocomplete.php", params=params, headers={
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.93 Safari/537.36'
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+            'Referer': 'https://rule34.xxx/'
         })
         if response.status_code >= 400:
             self.__logger.warning("Request failed with status code %d" % response.status_code)
